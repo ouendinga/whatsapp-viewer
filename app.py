@@ -119,9 +119,9 @@ if txt_file:
     st.subheader('Filtros y visualización de búsqueda')
     col1, col2 = st.columns(2)
     with col1:
-        start = st.date_input('Start date', value=None)
+        start = st.date_input('Fecha de inicio', value=None)
     with col2:
-        end = st.date_input('End date', value=None)
+        end = st.date_input('Fecha de fin', value=None)
     start_dt = datetime.combine(start, datetime.min.time()) if start else None
     end_dt = datetime.combine(end, datetime.max.time()) if end else None
 
