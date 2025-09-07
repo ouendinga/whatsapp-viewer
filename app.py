@@ -183,7 +183,7 @@ if txt_file:
                 if mime:
                     if mime.startswith('image'):
                         with open(file_path, 'rb') as img:
-                            st.image(img.read(), use_column_width=True)
+                            st.image(img.read(), use_container_width=True)
                     elif mime.startswith('video'):
                         with open(file_path, 'rb') as vid:
                             st.video(vid.read())
