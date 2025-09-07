@@ -14,15 +14,11 @@ Una herramienta en Python y Streamlit para visualizar, filtrar y explorar tus ch
 
 ## Cómo usar
 1. Coloca los archivos `.zip` exportados de tus chats de WhatsApp en la carpeta `chats/`.
-2. Ejecuta el script principal para extraer los chats:
-   ```bash
-   python main.py
-   ```
-3. Inicia la aplicación web:
+2. Inicia la aplicación web:
    ```bash
    streamlit run app.py
    ```
-4. Abre el navegador en la dirección que te indique Streamlit y explora tus chats.
+3. Abre el navegador en la dirección que te indique Streamlit y explora tus chats.
 
 ## Cómo exportar tus chats de WhatsApp
 
