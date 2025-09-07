@@ -1,2 +1,5 @@
 # Ignore exported WhatsApp chats
 chats/
+
+# Ignore output directory
+output/
