@@ -155,6 +155,12 @@ if txt_file:
     filtered_messages = [msg for msg in messages if message_matches(msg['text'], search_text, case_sensitive, whole_word)]
 
     st.subheader('Messages')
+    import mimetypes
+    MEDIA_EXTS = (
+        'jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'heic', 'heif',
+        'mp4', 'mov', 'avi', 'm4v', 'webm',
+        'mp3', 'ogg', 'wav', 'opus', 'm4a', 'aac'
+    )
     for msg in filtered_messages:
         parts = []
         if show_date:
@@ -164,30 +170,27 @@ if txt_file:
         parts.append(msg['text'])
         st.write(''.join(parts))
 
-    st.subheader('Media files')
-    import mimetypes
-    media = list_media_by_date(chat, txt_file, start_dt, end_dt)
-    for f in media:
-        file_path = os.path.join(OUTPUT_DIR, chat, f)
-        mime, _ = mimetypes.guess_type(file_path)
-        st.markdown(f'**{f}**')
-        if mime:
-            if mime.startswith('image'):
-                with open(file_path, 'rb') as img_file:
-                    st.image(img_file.read(), use_column_width=True)
-            elif mime.startswith('video'):
-                with open(file_path, 'rb') as vid_file:
-                    st.video(vid_file.read())
-            elif mime.startswith('audio'):
-                with open(file_path, 'rb') as aud_file:
-                    st.audio(aud_file.read())
-        # Botones de acciones
-        colA, colB, colC = st.columns(3)
-        with colA:
-            st.download_button('Ver/Descargar', file_path, file_name=f)
-        with colB:
-            st.markdown(f'<a href="file://{os.path.abspath(file_path)}" target="_blank">Abrir en nueva pestaña</a>', unsafe_allow_html=True)
-        with colC:
-            st.code(os.path.abspath(file_path), language=None)
+        # Buscar referencias a archivos multimedia en el texto del mensaje, incluyendo casos con carácter invisible y ' (archivo adjunto)'
+        file_refs = re.findall(r'[\u200e]?([\w\-]+\.(?:' + '|'.join(MEDIA_EXTS) + '))(?: \(archivo adjunto\))?', msg['text'], re.IGNORECASE)
+        for media_file in file_refs:
+            # Limpiar posibles caracteres invisibles y sufijos
+            clean_file = media_file.replace('\u200e', '').replace(' (archivo adjunto)', '').strip()
+            file_path = os.path.join(OUTPUT_DIR, str(chat), clean_file)
+            if not os.path.exists(file_path):
+                file_path = os.path.join(OUTPUT_DIR, str(chat), os.path.basename(clean_file))
+            if os.path.exists(file_path):
+                mime, _ = mimetypes.guess_type(file_path)
+                if mime:
+                    if mime.startswith('image'):
+                        with open(file_path, 'rb') as img:
+                            st.image(img.read(), use_column_width=True)
+                    elif mime.startswith('video'):
+                        with open(file_path, 'rb') as vid:
+                            st.video(vid.read())
+                    elif mime.startswith('audio'):
+                        with open(file_path, 'rb') as aud:
+                            st.audio(aud.read())
+                else:
+                    st.markdown(f"[Descargar {clean_file}](file://{os.path.abspath(file_path)})")
 else:
     st.warning('No .txt file found in this chat.')
