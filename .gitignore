@@ -1,5 +1,5 @@
-# Ignore exported WhatsApp chats
-chats/
-
-# Ignore output directory
-output/
+# Mantener solo .gitkeep en las carpetas chats y output
+chats/*
+!chats/.gitkeep
+output/*
+!output/.gitkeep
