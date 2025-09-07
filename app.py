@@ -138,7 +138,12 @@ if txt_file:
     with col6:
         show_date = st.checkbox('Mostrar fecha del mensaje', value=True)
 
+
+    # Dropdown para elegir el orden de los mensajes
+    order = st.selectbox('Orden de los mensajes', ['Ascendente (más antiguos primero)', 'Descendente (más recientes primero)'], index=0)
     messages = parse_messages(txt_file, start_dt, end_dt)
+    if order == 'Descendente (más recientes primero)':
+        messages = list(reversed(messages))
 
     # Filtrado por texto
     def message_matches(msg_text, search_text, case_sensitive, whole_word):
@@ -154,14 +159,22 @@ if txt_file:
 
     filtered_messages = [msg for msg in messages if message_matches(msg['text'], search_text, case_sensitive, whole_word)]
 
-    st.subheader('Messages')
+    st.subheader('Mensajes')
     import mimetypes
     MEDIA_EXTS = (
         'jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'heic', 'heif',
         'mp4', 'mov', 'avi', 'm4v', 'webm',
         'mp3', 'ogg', 'wav', 'opus', 'm4a', 'aac'
     )
+    last_day = None
     for msg in filtered_messages:
+        msg_day = msg['date'].date()
+        if last_day != msg_day:
+            # Día de la semana en español
+            dias_semana = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo']
+            dia_semana = dias_semana[msg["date"].weekday()]
+            st.markdown(f'<div style="background:#222;padding:6px 0 6px 0;text-align:center;border-radius:8px;margin:16px 0 8px 0;font-weight:bold;letter-spacing:1px;">{dia_semana.capitalize()}, {msg["date"].strftime("%d/%m/%Y")}</div>', unsafe_allow_html=True)
+            last_day = msg_day
         parts = []
         if show_date:
             parts.append(f"[{msg['date'].strftime('%d/%m/%Y %H:%M')}] ")
